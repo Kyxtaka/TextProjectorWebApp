@@ -1,0 +1,23 @@
+{
+  "name": "textprojector-webapp",
+  "version": "1.0.0",
+  "description": "TextProjector WebApp",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "client:watch:dev": "cd ./application && npm run watch"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "crosenv": "^1.0.0",
+    "install": "^0.13.0",
+    "tailwindcss": "^4.3.3"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.5.1": true
+  }
+}
