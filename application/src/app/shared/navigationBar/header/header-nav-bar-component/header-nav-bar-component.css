@@ -1,0 +1,27 @@
+.topbar { display: flex; align-items: center; justify-content: space-between; min-height: 72px; padding: 0 32px; background: rgb(255 255 255 / 88%); border-bottom: 1px solid #e7ebf2; backdrop-filter: blur(12px); }
+.topbar-start, .topbar-actions, .profile-button, .search-box, .breadcrumb { display: flex; align-items: center; }
+.topbar-start, .topbar-actions { gap: 18px; }
+.breadcrumb { gap: 10px; color: #96a0b2; font-size: 13px; }
+.breadcrumb b { color: #cbd2de; font-weight: 400; }
+.breadcrumb strong { color: #4a556b; font-weight: 600; }
+.icon-button, .profile-button { border: 0; background: transparent; color: #647089; cursor: pointer; }
+.icon-button { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 8px; }
+.icon-button:hover, .profile-button:hover { background: #f0f3f8; color: #202b40; }
+.icon-button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
+.search-box { width: min(260px, 25vw); height: 36px; gap: 8px; padding: 0 10px; color: #9aa4b5; background: #f5f7fa; border: 1px solid #edf0f5; border-radius: 7px; }
+.search-box svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.search-box input { min-width: 0; flex: 1; color: #253047; background: transparent; border: 0; outline: 0; font: inherit; font-size: 12px; }
+.search-box input::placeholder { color: #aab2c0; }
+.custom-action { padding: 8px 10px; color: #5269a7; background: #eef1fb; border: 1px solid #e0e5f6; border-radius: 6px; font: inherit; font-size: 11px; cursor: pointer; }
+.custom-action:hover { background: #e3e8f8; }
+kbd { padding: 2px 5px; color: #9ca6b7; background: #fff; border: 1px solid #e2e6ee; border-radius: 4px; font-size: 10px; }
+.notification-button { position: relative; }
+.notification-button i { position: absolute; top: 7px; right: 7px; width: 5px; height: 5px; background: #ee6b5c; border: 1px solid #fff; border-radius: 50%; }
+.topbar-divider { width: 1px; height: 26px; background: #e7ebf2; }
+.profile-button { gap: 9px; padding: 4px 0 4px 4px; text-align: left; }
+.avatar { display: grid; width: 32px; height: 32px; place-items: center; color: #fff; background: #5269a7; border-radius: 50%; font-size: 11px; font-weight: 700; }
+.profile-copy { display: flex; flex-direction: column; gap: 2px; }
+.profile-copy strong { color: #29344a; font-size: 12px; font-weight: 600; }
+.profile-copy small { color: #9aa4b4; font-size: 10px; }
+.chevron { width: 15px; height: 15px; margin-left: 4px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
+@media (max-width: 760px) { .topbar { padding: 0 16px; } .breadcrumb, .profile-copy, .chevron, .topbar-divider { display: none; } .search-box { width: 36px; padding: 0; justify-content: center; border: 0; } .search-box input, .search-box kbd { display: none; } .topbar-actions { gap: 8px; } }

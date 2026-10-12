@@ -1,0 +1,25 @@
+<section class="welcome-page">
+  <div class="welcome-copy">
+    <span class="eyebrow"><i></i> Your words, projected beautifully</span>
+    <h1>Bring every song<br /><em>to the light.</em></h1>
+    <p class="intro">TextProjector gives your team a calm, reliable space to prepare, organize and project lyrics when the moment matters.</p>
+    <div class="welcome-actions">
+      <a class="primary-action" routerLink="/register">Create your workspace <span>-></span></a>
+      <a class="secondary-action" routerLink="/login">Sign in</a>
+      <button class="secondary-action projection-action" type="button" (click)="openProjection()">Open projection</button>
+    </div>
+    <div class="trust-line"><span class="avatars"><i>AM</i><i>KB</i><i>JD</i></span><span>Made for teams that lead from the front.</span></div>
+  </div>
+
+  <div class="welcome-visual" aria-label="TextProjector workspace preview">
+    <div class="visual-glow"></div>
+    <div class="preview-window">
+      <div class="preview-topbar"><span class="window-dots"><i></i><i></i><i></i></span><span>Sunday service / Setlist</span><b>•••</b></div>
+      <div class="preview-body">
+        <div class="preview-sidebar"><span class="mini-logo">T</span><i class="mini-active"></i><i></i><i></i><i></i></div>
+        <div class="preview-content"><div class="preview-heading"><span>Now projecting</span><b>LIVE</b></div><div class="song-card"><small>SONG 04 / VERSE 2</small><strong>Let every<br />heart sing</strong><span class="song-rule"></span><small>Key of C &nbsp; · &nbsp; 04:32</small></div><div class="preview-footer"><span>Previous</span><span>04 / 08</span><span>Next <b>-></b></span></div></div>
+      </div>
+    </div>
+    <div class="floating-note"><span>Next up</span><strong>Build My Life</strong><small>in 02:14</small></div>
+  </div>
+</section>

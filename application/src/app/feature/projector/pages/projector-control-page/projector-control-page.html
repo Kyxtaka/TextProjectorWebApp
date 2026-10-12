@@ -1,0 +1,134 @@
+<section class="projector-control-page">
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow"><span></span> Live workspace</p>
+      <h1>Projector control</h1>
+      <p class="intro">Send a text or a new background to the projection window in real time.</p>
+    </div>
+    <button class="open-button" type="button" (click)="openProjection()">
+      <span aria-hidden="true">↗</span> Open projection
+    </button>
+  </div>
+
+  <section class="target-panel">
+    <div class="target-copy">
+      <span class="panel-kicker">Output / Client window</span>
+      <h2>Choose a projection window</h2>
+      <p>Each target is isolated to this browser and can be opened separately.</p>
+    </div>
+    <div class="target-actions">
+      <label class="field-label" for="projection-target">Active window</label>
+      <select id="projection-target" [disabled]="broadcastToAllScreens" [(ngModel)]="selectedTargetId" (ngModelChange)="selectTarget()">
+        @for (target of targets; track target.id) {
+          <option [value]="target.id">{{ target.name }}</option>
+        }
+      </select>
+      <div class="new-target">
+        <input type="text" [(ngModel)]="newTargetName" placeholder="New window name" (keyup.enter)="createTarget()" />
+        <button class="secondary-button" type="button" [disabled]="!newTargetName.trim()" (click)="createTarget()">Add window</button>
+      </div>
+      <label class="all-screens-toggle"><input type="checkbox" [(ngModel)]="broadcastToAllScreens" (ngModelChange)="setBroadcastMode()" /> Send to all projection windows</label>
+    </div>
+  </section>
+
+  <div class="control-grid">
+    <section class="control-panel text-panel">
+      <div class="panel-heading"><div><span class="panel-kicker">01 / Content</span><h2>Send a text</h2></div><span class="live-dot">Live</span></div>
+      <label class="field-label" for="projection-text">Text to project</label>
+      <textarea id="projection-text" [(ngModel)]="text" placeholder="Type the next line..." rows="5"></textarea>
+      <div class="field-row">
+        <label class="field-label">Text color <input class="color-input" type="color" [(ngModel)]="textColor" /></label>
+        <label class="field-label" for="font-size">Size <input id="font-size" class="number-input" type="number" min="16" max="180" [(ngModel)]="fontSize" /> px</label>
+      </div>
+      <button class="primary-button" type="button" [disabled]="!text.trim()" (click)="sendText()">Send text <span>→</span></button>
+      <div class="quick-texts">
+        <span>Quick send</span>
+        <button type="button" (click)="sendExample('Welcome')">Welcome</button>
+        <button type="button" (click)="sendExample('Let every heart sing')">Let every heart sing</button>
+      </div>
+    </section>
+
+    <section class="control-panel appearance-panel">
+      <div class="panel-heading"><div><span class="panel-kicker">02 / Scene</span><h2>Appearance</h2></div></div>
+      <div class="scene-block">
+        <label class="field-label">Background color <input class="color-input" type="color" [(ngModel)]="backgroundColor" /></label>
+        <button class="secondary-button" type="button" (click)="sendBackgroundColor()">Apply color <span>→</span></button>
+      </div>
+      <div class="scene-block">
+        <label class="field-label" for="background-image">Background image URL</label>
+        <div class="image-source-switch">
+          <button type="button" [class.active]="imageSource === 'server'" (click)="imageSource = 'server'">Server library</button>
+          <button type="button" [class.active]="imageSource === 'upload'" (click)="imageSource = 'upload'">Import image</button>
+          <button type="button" [class.active]="imageSource === 'url'" (click)="imageSource = 'url'">Image URL</button>
+        </div>
+        @if (imageSource === 'server') {
+          <div class="server-images">
+            @for (image of serverImages; track image.id) {
+              <button class="server-image" type="button" [class.selected]="selectedServerImageId === image.id" (click)="selectServerImage(image)">
+                <img [src]="image.url" [alt]="image.name" />
+                <span>{{ image.name }}</span>
+              </button>
+            }
+          </div>
+        } @else if (imageSource === 'upload') {
+          <label class="upload-dropzone" for="background-image-upload"><span aria-hidden="true">↑</span><strong>{{ uploadedImageName || 'Choose an image' }}</strong><small>PNG, JPG or WEBP</small></label>
+          <input id="background-image-upload" class="visually-hidden" type="file" accept="image/png,image/jpeg,image/webp" (change)="onImageSelected($event)" />
+        } @else {
+          <input id="background-image-url" type="url" [(ngModel)]="backgroundImage" placeholder="https://example.com/background.jpg" />
+        }
+        <button class="secondary-button" type="button" [disabled]="!backgroundImage" (click)="sendBackgroundImage()">Apply image <span>→</span></button>
+      </div>
+      <div class="transition-block">
+        <span class="field-label">Next text transition</span>
+        <div class="transition-options">
+          <label><input type="radio" name="transition" value="none" [(ngModel)]="transitionEffect" /> None</label>
+          <label><input type="radio" name="transition" value="fade" [(ngModel)]="transitionEffect" /> Fade</label>
+          <label><input type="radio" name="transition" value="slide" [(ngModel)]="transitionEffect" /> Slide</label>
+        </div>
+        <label class="field-label" for="transition-duration">Duration <input id="transition-duration" class="number-input" type="number" min="0" max="5000" step="100" [(ngModel)]="transitionDuration" /> ms</label>
+      </div>
+    </section>
+  </div>
+
+  <section class="content-section">
+    <div class="content-heading">
+      <div>
+        <span class="panel-kicker">03 / Library</span>
+        <h2>Project content</h2>
+      </div>
+      <div class="content-switch" role="tablist" aria-label="Content type">
+        <button type="button" [class.active]="contentMode === 'songs'" (click)="contentMode = 'songs'">Songs</button>
+        <button type="button" [class.active]="contentMode === 'bible'" (click)="contentMode = 'bible'">Bible</button>
+      </div>
+    </div>
+
+    <label class="content-search" for="content-search"><span aria-hidden="true">⌕</span><input id="content-search" type="search" [(ngModel)]="contentSearch" [placeholder]="contentMode === 'songs' ? 'Search title, author, album, lyrics...' : 'Search book, verse or text...'" /></label>
+
+    <div class="library-grid" [hidden]="contentMode !== 'songs'">
+        <div class="library-list">
+          <div class="list-heading"><strong>Song library</strong><span>{{ filteredSongs().length }} results</span></div>
+          @for (song of filteredSongs(); track song.id) {
+            <button class="song-card compact" type="button" (click)="selectSong(song)"><span class="song-icon" aria-hidden="true">♪</span><span class="song-copy"><strong>{{ song.title }}</strong><small>{{ song.author }}@if (song.album) { <span> · {{ song.album }}</span> }</small></span><span class="song-arrow" aria-hidden="true">→</span></button>
+          } @empty {
+            <p class="empty-state">No song matches this search.</p>
+          }
+        </div>
+        <div class="library-detail">
+          @if (selectedSong; as song) {
+            <div class="detail-heading"><div><span class="panel-kicker">Selected song</span><h3>{{ song.title }}</h3><p>{{ song.author }} · {{ song.album }}</p></div><button class="secondary-button" type="button" (click)="togglePlaylist(song)">{{ isInPlaylist(song) ? 'In playlist' : 'Add to playlist' }}</button></div>
+            <div class="lyrics-list">
+              @for (line of song.lyrics; track line) { <button type="button" (click)="projectSongLine(line)">{{ line }}</button> }
+            </div>
+          } @else { <p class="empty-state">Select a song to browse its lyrics.</p> }
+          <div class="playlist-block"><div class="list-heading"><strong>Playlist</strong><span>{{ playlist.length }} songs</span></div>@for (song of playlist; track song.id) { <button class="playlist-item" type="button" (click)="selectSong(song)"><span>{{ song.title }}</span><small>{{ song.author }}</small></button> } @empty { <p class="empty-state">Your playlist is empty.</p> }</div>
+        </div>
+    </div>
+    <div class="bible-grid" [hidden]="contentMode !== 'bible'">
+        <div class="library-list">
+          <div class="list-heading"><strong>Bible references</strong><span>{{ filteredVerses().length }} results</span></div>
+          @for (verse of filteredVerses(); track verse.id) { <button class="verse-item" type="button" (click)="projectVerse(verse)"><strong>{{ verse.book }} {{ verse.chapter }}:{{ verse.verse }}</strong><span>{{ verse.text }}</span></button> } @empty { <p class="empty-state">No verse matches this search.</p> }
+        </div>
+        <div class="bible-note"><span class="panel-kicker">Quick projection</span><h3>Choose a reference</h3><p>Select a Bible verse on the left to send its text to the active projection.</p></div>
+    </div>
+  </section>
+</section>

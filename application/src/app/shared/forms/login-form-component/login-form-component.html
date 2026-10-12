@@ -1,0 +1,40 @@
+<div class="login-form">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        @if (isCredentialsInvalid()) {
+            <div class="error-message">
+                Invalid username/email or password.
+            </div>
+        }
+
+        <div class="form-fields">
+            <div class="field-group">
+                <label for="identifier">Username / Email</label>
+                <input type="text" id="identifier" formControlName="identifier" placeholder="you@example.com" autocomplete="username">
+
+                @if (loginForm.get('identifier')?.invalid && loginForm.get('identifier')?.touched) {
+                    <div class="field-error">
+                        Username / Email is required.
+                    </div>
+                }
+            </div>
+
+            <div class="field-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" formControlName="password" placeholder="Enter your password" autocomplete="current-password">
+                @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                    <div class="field-error">
+                        Password is required.
+                    </div>
+                }
+                
+                <!-- <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error text-red-500 font-size-sm">
+                    Password is required.
+                </div> -->
+            </div>
+        </div>
+        <label class="remember-row"><input type="checkbox" formControlName="rememberMe"><span>Keep me signed in</span><a href="#">Forgot password?</a></label>
+        <div class="submit-row">
+            <button type="submit" [disabled]="loginForm.invalid || isLoading()">{{ isLoading() ? 'Signing in...' : 'Sign in' }} <span>→</span></button>
+        </div>
+    </form>
+</div>

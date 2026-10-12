@@ -11,9 +11,9 @@ export class ApiAuthService {
     private apiNetwork: ApiNetwork = inject(ApiNetwork); 
     private readonly API_AUTH_SERVICE_PREFIX = '/auth';
     
-    public async login(username: string, password: string): Promise<{ access_token: string, refresh_token: string } | null> {
+    public async login(email: string, password: string): Promise<{ access_token: string, refresh_token: string } | null> {
         const url = `${this.API_AUTH_SERVICE_PREFIX}/login`;
-        const body = { username, password };
+        const body = { email, password };
         try {
             return await firstValueFrom(this.apiNetwork.post<{ access_token: string, refresh_token: string }>(url, body, false));
         } catch (error) {
@@ -37,16 +37,17 @@ export class ApiAuthService {
 
     // User profile to define
     /**
+     * Fetches the user's profile.
      * 
      * @returns {
-    "uuid": "d035ab43-91a0-11f1-87e7-bebe360301fa",
-    "id": 3,
-    "username": "Hikarizsu",
-    "email": "randriantsoanathan1@gmail.com",
-    "permission": "SUPER_ADMIN",
-    "createdAt": "2026-08-04T05:57:59.235Z",
-    "updatedAt": "2026-08-06T12:12:08.919Z"
-}
+        "uuid": "d035ab43-91a0-11f1-87e7-bebe360301fa",
+        "id": 3,
+        "username": "Hikarizsu",
+        "email": "randriantsoanathan1@gmail.com",
+        "permission": "SUPER_ADMIN",
+        "createdAt": "2026-08-04T05:57:59.235Z",
+        "updatedAt": "2026-08-06T12:12:08.919Z"
+    }
      */
     public async getUserProfile(): Promise <any | null> {
         const url = `${this.API_AUTH_SERVICE_PREFIX}/profile`;

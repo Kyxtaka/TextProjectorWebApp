@@ -43,6 +43,6 @@ export class ApiNetwork {
         if (token && authenticate) {
             headers = headers.set('Authorization', `Bearer ${token}`);
         }
-        return this.httpClient.delete<T>(url, { ...options, headers });
+        return this.httpClient.delete<T>(`${this.API_BASE_URL}${url}`, { ...options, headers });
     }
 }

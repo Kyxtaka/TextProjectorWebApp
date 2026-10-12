@@ -1,0 +1,34 @@
+<section class="song-management-page">
+  <header class="page-heading">
+    <div><p class="eyebrow"><span></span> Content library</p><h1>Songs</h1><p class="intro">Create, organize and prepare the songs used in your projections.</p></div>
+    <button class="primary-button" type="button" (click)="startCreate()"><span>+</span> New song</button>
+  </header>
+
+  <div class="song-workspace">
+    <aside class="song-list-panel">
+      <div class="list-top"><div><strong>Song library</strong><span>{{ filteredSongs().length }} songs</span></div></div>
+      <label class="search-box" for="song-search"><span aria-hidden="true">⌕</span><input id="song-search" type="search" [(ngModel)]="search" placeholder="Search songs or lyrics..." /></label>
+      <div class="song-list">
+        @for (song of filteredSongs(); track song.id) {
+          <button class="song-list-item" [class.active]="selectedSong?.id === song.id" type="button" (click)="selectSong(song)"><span class="song-list-icon">♪</span><span><strong>{{ song.title }}</strong><small>{{ song.content.length }} sections</small></span><b>→</b></button>
+        } @empty { <p class="empty-state">No songs found.</p> }
+      </div>
+    </aside>
+
+    <main class="song-editor-panel">
+      @if (editingSong; as draft) {
+        <div class="editor-header"><div><span class="panel-kicker">Song editor</span><h2>{{ draft.title || 'New song' }}</h2></div><div class="editor-actions"><button class="ghost-button" type="button" (click)="cancelEdit()">Cancel</button><button class="primary-button small" type="button" [disabled]="!draft.title.trim()" (click)="saveSong()">Save song</button></div></div>
+        <label class="field-label" for="song-title">Title</label><input id="song-title" class="title-input" type="text" [(ngModel)]="draft.title" placeholder="Song title" />
+        <div class="content-header"><div><span class="panel-kicker">Content</span><p>Each item becomes a selectable projection section.</p></div><button class="secondary-button" type="button" (click)="addContentItem()">+ Add section</button></div>
+        <div class="content-editor">
+          @for (item of draft.content; track $index; let itemIndex = $index) {
+            <article class="content-row"><div class="content-order">{{ item.order | number:'2.0' }}</div><div class="content-fields"><select [(ngModel)]="item.type"><option value="intro">Intro</option><option value="strophe">Strophe</option><option value="refrain">Refrain</option><option value="pont">Pont</option><option value="outro">Outro</option></select><textarea [(ngModel)]="item.data" rows="3" placeholder="Write the section text..."></textarea></div><div class="row-actions"><button type="button" aria-label="Move section up" [disabled]="itemIndex === 0" (click)="moveContentItem(itemIndex, -1)">↑</button><button type="button" aria-label="Move section down" [disabled]="itemIndex === draft.content.length - 1" (click)="moveContentItem(itemIndex, 1)">↓</button><button class="delete-action" type="button" aria-label="Delete section" (click)="removeContentItem(itemIndex)">×</button></div></article>
+          }
+        </div>
+      } @else if (selectedSong; as song) {
+        <div class="editor-header"><div><span class="panel-kicker">Song details</span><h2>{{ song.title }}</h2><p>{{ song.content.length }} content sections</p></div><div class="editor-actions"><button class="danger-button" type="button" (click)="deleteSong(song)">Delete</button><button class="primary-button small" type="button" (click)="startEdit(song)">Edit song</button></div></div>
+        <div class="song-preview">@for (item of song.content; track item.order) { <article class="preview-section"><span>{{ contentLabel(item.type) }} / {{ item.order }}</span><p>{{ item.data }}</p></article> }</div>
+      } @else { <div class="empty-editor"><span>♪</span><h2>Your song library is empty</h2><p>Create your first song to start building your content library.</p><button class="primary-button" type="button" (click)="startCreate()">Create a song</button></div> }
+    </main>
+  </div>
+</section>

@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "client:watch:dev": "cd ./application && npm run watch"
+    "client:watch:dev": "cd ./application && npm run serve:dev",
+    "client:serve:dev": "cd ./application && npm run serve:dev"
+
   },
   "keywords": [],
   "type": "commonjs",

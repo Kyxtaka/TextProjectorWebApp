@@ -1,0 +1,12 @@
+<main
+  class="projection-page"
+  [style.background-color]="background().color"
+  [style.background-image]="background().image"
+>
+  <p class="projection-label">TextProjector / {{ targetLabel }}</p>
+  <p
+    class="projection-text"
+    [style]="textStyle()"
+    [style.animation]="transition()"
+  >{{ text() }}</p>
+</main>

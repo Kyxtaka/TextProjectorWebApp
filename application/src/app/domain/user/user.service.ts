@@ -30,6 +30,7 @@ export class UserService {
 
     public async getLoggedInUserProfile(): Promise<User | null> {
         const userDto = await this.apiAuthService.getUserProfile();
+        console.log('User profile fetched:', userDto);
         return userDto ? User.fromDto(userDto) : null;
     }
 

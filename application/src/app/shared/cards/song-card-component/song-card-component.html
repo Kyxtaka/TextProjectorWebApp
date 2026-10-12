@@ -1,0 +1,5 @@
+<button class="song-card" [class.compact]="compact" type="button" (click)="songSelected.emit(song)">
+	<span class="song-icon" aria-hidden="true">♪</span>
+	<span class="song-copy"><strong>{{ song.title }}</strong><small>{{ song.author }}@if (song.album) { <span> · {{ song.album }}</span> }</small></span>
+	<span class="song-arrow" aria-hidden="true">→</span>
+</button>

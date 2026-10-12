@@ -7,7 +7,7 @@
 <!-- * * * * * * * to get started with your project! * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
-<style>
+<!-- <style>
   :host {
     --bright-blue: oklch(51.01% 0.274 263.83);
     --electric-violet: oklch(53.18% 0.28 296.97);
@@ -330,7 +330,19 @@
       </div>
     </div>
   </div>
-</main>
+</main> -->
+
+<div class="page-container" [class.sidebar-collapsed]="!sidebarOpen()">
+  <aside class="sidebar-shell">
+    <app-left-side-nav-bar-component></app-left-side-nav-bar-component>
+  </aside>
+  <main class="main-content">
+    <app-header-nav-bar-component (sidebarToggle)="toggleSidebar()"></app-header-nav-bar-component>
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
 
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
@@ -341,4 +353,4 @@
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
 
-<router-outlet />
+<!-- <router-outlet /> -->

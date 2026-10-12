@@ -1,0 +1,34 @@
+<aside class="side-nav">
+	<div class="brand"><span class="brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18V6l7-3 7 3v12l-7 3-7-3Z"/><path d="m5 6 7 3 7-3M12 9v12"/></svg></span><span>TextProjector</span></div>
+	<nav class="navigation" aria-label="Main navigation">
+		@for (section of sections(); track section; let sectionIndex = $index) {
+			<p class="nav-label" [class.second-label]="sectionIndex > 0">{{ section }}</p>
+			@for (item of itemsForSection(section); track item.id) {
+				<a class="nav-item" [class.active]="isActive(item)" [href]="item.href || '#'" (click)="selectItem(item); $event.preventDefault()">
+					<span class="nav-icon" aria-hidden="true">
+						@switch (item.icon) {
+							@case ('grid') { <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg> }
+							@case ('folder') { <svg viewBox="0 0 24 24"><path d="M3.5 7.5h6l2 2h9v9h-17z"/><path d="M3.5 7.5v-2h6l2 2"/></svg> }
+							@case ('music') { <svg viewBox="0 0 24 24"><path d="M9 17V5l10-2v12"/><circle cx="6" cy="17" r="3"/><circle cx="16" cy="15" r="3"/></svg> }
+							@case ('projector') { <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M8 20h8M12 16v4M8 9h8M8 12h.01"/></svg> }
+							@case ('users') { <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19c.5-3 2.5-5 6-5s5.5 2 6 5M16 5.5a3 3 0 0 1 0 5.8M18 14c1.7.7 2.7 2.3 3 5"/></svg> }
+							@case ('settings') { <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-2.5V20a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1A1.7 1.7 0 0 0 8.1 15a1.7 1.7 0 0 0-1.6-1H6v-2.5h.5a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V5H15v.5a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2V14H21a1.7 1.7 0 0 0-1.6 1Z"/></svg> }
+							@case ('help') { <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.7 9a2.4 2.4 0 1 1 4.1 1.7c-1.2 1.1-1.8 1.4-1.8 2.8M12 17h.01"/></svg> }
+						}
+					</span><span>{{ item.label }}</span>@if (item.badge) { <em>{{ item.badge }}</em> }
+				</a>
+			}
+		}
+	</nav>
+	<div class="side-footer">
+		<!-- <div class="upgrade-card"><strong>Need more space?</strong><span>Upgrade your workspace to unlock more projects.</span><button type="button">View plans <span>-></span></button></div> -->
+		<div class="side-profile">
+			<span class="avatar">{{ accountService.userData()?.username?.charAt(0) }}</span>
+			<div>
+				<strong>{{ accountService.userData()?.username }}</strong>
+				<small>{{ accountService.userData()?.permission }}</small>
+			</div>
+			<button type="button" aria-label="Profile options">...</button>
+		</div>
+	</div>
+</aside>

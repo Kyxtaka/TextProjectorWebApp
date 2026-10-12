@@ -22,7 +22,7 @@ export class ApiToken {
     }
     
     public async apiIsTokenValidByAPI(token: string): Promise<boolean> {
-        if (!this.tokenService.isTokenExpired(token)) {
+        if (this.tokenService.isTokenExpired(token)) {
             return false;
         }
         if (!await this.apiGetTokenPayload()) {

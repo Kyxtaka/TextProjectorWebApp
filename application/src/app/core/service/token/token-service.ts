@@ -1,18 +1,16 @@
-import { Service, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CookieService, CookieOptions } from 'ngx-cookie-service';
 import { ApiConstant } from '../../network/api/constant/constant';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 
 
-@Service()
+@Injectable({ providedIn: 'root' })
 export class TokenService {
     private cookieService: CookieService = inject(CookieService);
-    private secureCookieOptions: CookieOptions = {
-        expires: new Date(new Date().setDate(new Date().getDate() + 7)),
-        path: '/', 
-        domain: window.location.hostname, 
-        sameSite: 'Strict', 
-        secure: true
+    private readonly cookieOptions: CookieOptions = {
+        path: '/',
+        sameSite: 'Lax',
+        secure: window.location.protocol === 'https:',
     };
 
     constructor() {}
@@ -21,8 +19,8 @@ export class TokenService {
      * Sets the access token in a secure cookie 
      * @param token string
      */
-    public setToken(token: string): void {
-        this.cookieService.set(ApiConstant.TOKEN_KEY, token, this.secureCookieOptions);
+    public setToken(token: string, rememberMe = true): void {
+        this.cookieService.set(ApiConstant.TOKEN_KEY, token, this.cookieOptionsFor(rememberMe));
     }
 
     /**
@@ -41,8 +39,8 @@ export class TokenService {
      * Sets the refresh token in a secure cookie
      * @param refreshToken string
      */
-    public setRefreshToken(refreshToken: string): void {
-        this.cookieService.set(ApiConstant.REFRESH_TOKEN_KEY, refreshToken, this.secureCookieOptions);
+    public setRefreshToken(refreshToken: string, rememberMe = true): void {
+        this.cookieService.set(ApiConstant.REFRESH_TOKEN_KEY, refreshToken, this.cookieOptionsFor(rememberMe));
     }
 
     /**
@@ -58,8 +56,8 @@ export class TokenService {
     }
 
     public clearTokens(): void {
-        this.cookieService.delete(ApiConstant.TOKEN_KEY, '/', '', true);
-        this.cookieService.delete(ApiConstant.REFRESH_TOKEN_KEY, '/', '', true);
+        this.cookieService.delete(ApiConstant.TOKEN_KEY, '/', '', this.cookieOptions.secure);
+        this.cookieService.delete(ApiConstant.REFRESH_TOKEN_KEY, '/', '', this.cookieOptions.secure);
     }
 
     public hasToken(): boolean {
@@ -83,7 +81,7 @@ export class TokenService {
             }
             const exp = (decoded as { exp: number }).exp;
             const currentTime = Math.floor(Date.now() / 1000);
-            return exp < currentTime;
+            return exp <= currentTime;
         } catch (error) {
             console.error('Error decoding token:', error);
         }
@@ -122,6 +120,12 @@ export class TokenService {
             return false;
         }
         return !this.isTokenExpired(stringToken);
+    }
+
+    private cookieOptionsFor(rememberMe: boolean): CookieOptions {
+        return rememberMe
+            ? { ...this.cookieOptions, expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) }
+            : this.cookieOptions;
     }
 
 }

@@ -1,0 +1,13 @@
+<form class="account-form" [formGroup]="accountForm" (ngSubmit)="submit()">
+	@if (submitted()) { <div class="success-message">Your workspace request is ready. API connection will be added next.</div> }
+	<div class="form-row">
+		<div class="field-group"><label for="account-name">Full name</label><input id="account-name" type="text" formControlName="name" placeholder="John Doe" autocomplete="name">@if (accountForm.get('name')?.invalid && accountForm.get('name')?.touched) { <small class="field-error">Enter at least 2 characters.</small> }</div>
+		<div class="field-group"><label for="account-email">Email address</label><input id="account-email" type="email" formControlName="email" placeholder="you@example.com" autocomplete="email">@if (accountForm.get('email')?.invalid && accountForm.get('email')?.touched) { <small class="field-error">Enter a valid email.</small> }</div>
+	</div>
+	<div class="form-row">
+		<div class="field-group"><label for="account-password">Password</label><input id="account-password" type="password" formControlName="password" placeholder="8 characters minimum" autocomplete="new-password">@if (accountForm.get('password')?.invalid && accountForm.get('password')?.touched) { <small class="field-error">Use at least 8 characters.</small> }</div>
+		<div class="field-group"><label for="account-confirm-password">Confirm password</label><input id="account-confirm-password" type="password" formControlName="confirmPassword" placeholder="Repeat your password" autocomplete="new-password">@if (passwordsDoNotMatch()) { <small class="field-error">Passwords do not match.</small> }</div>
+	</div>
+	<label class="terms-row"><input type="checkbox" required><span>I agree to the workspace terms and privacy policy.</span></label>
+	<button class="submit-button" type="submit" [disabled]="submitted()">{{ submitted() ? 'Workspace ready' : 'Create workspace' }} <span>→</span></button>
+</form>
