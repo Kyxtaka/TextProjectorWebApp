@@ -7,7 +7,11 @@ export interface SongContentItem {
 }
 
 export interface SongDocument {
-  id: string;
+  _id: string;
   title: string;
   content: SongContentItem[];
+  artist?: string;
+  album?: string;
+  year?: number;
+  updatedAt?: string;
 }

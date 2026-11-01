@@ -28,5 +28,8 @@ export class HeaderNavBarComponent {
   @Output() readonly actionSelected = new EventEmitter<string>();
 
   protected accountService = inject(AccountService);
-
+  
+  async ngOnInit(): Promise<void> {
+    await this.accountService.refreshUserProfile();
+  }
 }

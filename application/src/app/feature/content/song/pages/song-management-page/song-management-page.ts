@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SongService } from '../../../../../domain/song/song-service';
 import { SongContentItem, SongContentType, SongDocument } from '../../model/song-document';
 
 @Component({
@@ -9,44 +10,41 @@ import { SongContentItem, SongContentType, SongDocument } from '../../model/song
   styleUrl: './song-management-page.css',
   templateUrl: './song-management-page.html',
 })
-export class SongManagementPageComponent {
+export class SongManagementPageComponent implements OnInit {
+  private readonly songService = inject(SongService);
+  // private readonly apiSongService = inject(ApiSongService);
+  private readonly changeDetector = inject(ChangeDetectorRef);
   protected search = '';
-  protected songs: SongDocument[] = [
-    {
-      id: 'song-1',
-      title: 'Build My Life',
-      content: [
-        { type: 'strophe', data: 'Worthy of every song we could ever sing', order: 1 },
-        { type: 'refrain', data: 'Jesus, the name above every other name', order: 2 },
-      ],
-    },
-    {
-      id: 'song-2',
-      title: 'Let Every Heart Sing',
-      content: [
-        { type: 'strophe', data: 'Let every heart sing, let every voice arise', order: 1 },
-        { type: 'refrain', data: 'Your light is breaking through the night', order: 2 },
-      ],
-    },
-    {
-      id: 'song-3',
-      title: 'Great Are You Lord',
-      content: [
-        { type: 'strophe', data: 'You give life, You are love', order: 1 },
-        { type: 'refrain', data: 'It is Your breath in our lungs', order: 2 },
-      ],
-    },
-  ];
-  protected selectedSong: SongDocument | null = this.songs[0];
+  protected songs: SongDocument[] = [];
+  protected selectedSong: SongDocument | null = null;
   protected editingSong: SongDocument | null = null;
+  protected syncMessage = 'Chargement de la bibliothèque cloud...';
+
+  public async ngOnInit(): Promise<void> {
+    this.songs = [];
+    this.selectedSong = this.songs[0] ?? null;
+    this.changeDetector.detectChanges();
+    this.syncMessage = 'Synchronisation avec le cloud...';
+
+    try {
+      const cloudSongs = await this.songService.getAllSongs();
+      this.songs = cloudSongs.map((song) => this.songService.convertToSongDocument(song));
+      this.selectedSong = this.songs[0] ?? null;
+      this.syncMessage = 'Bibliothèque synchronisée avec le cloud';
+      this.changeDetector.detectChanges();
+    } catch {
+      this.songs = [];
+      this.selectedSong = null;
+      this.syncMessage = 'Impossible de charger les chansons depuis le cloud';
+      this.changeDetector.detectChanges();
+    }
+  }
 
   protected filteredSongs(): SongDocument[] {
     const query = this.search.trim().toLowerCase();
-    if (!query) {
-      return this.songs;
-    }
-
-    return this.songs.filter((song) => `${song.title} ${song.content.map((item: SongContentItem) => item.data).join(' ')}`.toLowerCase().includes(query));
+    return this.songs
+      .filter((song) => !query || `${song.title} ${song.content.map((item: SongContentItem) => item.data).join(' ')}`.toLowerCase().includes(query))
+      .sort((left, right) => left.title.localeCompare(right.title, 'fr', { sensitivity: 'base' }));
   }
 
   protected selectSong(song: SongDocument): void {
@@ -56,7 +54,7 @@ export class SongManagementPageComponent {
 
   protected startCreate(): void {
     this.editingSong = {
-      id: `song-${Date.now()}`,
+      _id: `song-${Date.now()}`,
       title: '',
       content: [this.newContent(1)],
     };
@@ -73,33 +71,56 @@ export class SongManagementPageComponent {
     this.selectedSong = this.selectedSong ?? this.songs[0] ?? null;
   }
 
-  protected saveSong(): void {
+  protected async saveSong(): Promise<void> {
     if (!this.editingSong?.title.trim()) {
       return;
     }
 
-    const savedSong = this.cloneSong(this.editingSong);
-    const existingIndex = this.songs.findIndex((song) => song.id === savedSong.id);
-    if (existingIndex === -1) {
-      this.songs = [...this.songs, savedSong];
-    } else {
-      this.songs = this.songs.map((song) => song.id === savedSong.id ? savedSong : song);
-    }
-    this.selectedSong = savedSong;
+    const savedSong = { ...this.cloneSong(this.editingSong), updatedAt: new Date().toISOString() };
+    const existingIndex = this.songs.findIndex((song) => song._id === savedSong._id);
+    const existingSong = existingIndex === -1 ? null : this.songs[existingIndex];
     this.editingSong = null;
+
+    try {
+      const payload = { title: savedSong.title, artist: savedSong.artist, album: savedSong.album, year: savedSong.year, content: savedSong.content };
+      const cloudSong = existingIndex === -1
+        ? await this.songService.createSong(payload)
+        : await this.songService.updateSong(savedSong._id, payload);
+      if (cloudSong) {
+        const syncedSong = this.songService.convertToSongDocument(cloudSong);
+        if (savedSong._id !== syncedSong._id) this.songs = this.songs.filter((song) => song._id !== savedSong._id);
+        this.replaceSong(syncedSong);
+        this.selectedSong = syncedSong;
+        this.syncMessage = 'Chanson synchronisée avec le cloud';
+        this.changeDetector.detectChanges();
+      }
+    } catch {
+      this.syncMessage = 'La chanson n’a pas pu être envoyée au cloud';
+      this.editingSong = savedSong;
+      this.selectedSong = existingSong;
+    }
   }
 
-  protected deleteSong(song: SongDocument): void {
-    this.songs = this.songs.filter((item) => item.id !== song.id);
-    this.selectedSong = this.songs[0] ?? null;
-    this.editingSong = null;
+  protected async deleteSong(song: SongDocument): Promise<void> {
+    try {
+      console.log(song);
+      console.log("deleting song with id:", song._id);
+      await this.songService.deleteSong(song);
+      this.songs = this.songs.filter((item) => item._id !== song._id);
+      this.selectedSong = this.songs[0] ?? null;
+      this.editingSong = null;
+      console.log("song deleted successfully");
+      this.syncMessage = 'Chanson supprimée du cloud';
+      this.changeDetector.detectChanges();
+    } catch {
+      this.syncMessage = 'La chanson n’a pas pu être supprimée du cloud';
+    }
   }
 
   protected addContentItem(): void {
     if (!this.editingSong) {
       return;
     }
-
     this.editingSong.content = [...this.editingSong.content, this.newContent(this.editingSong.content.length + 1)];
   }
 
@@ -139,4 +160,10 @@ export class SongManagementPageComponent {
   private cloneSong(song: SongDocument): SongDocument {
     return { ...song, content: song.content.map((item: SongContentItem) => ({ ...item })) };
   }
+
+  private replaceSong(song: SongDocument): void {
+      const index = this.songs.findIndex((item) => item._id === song._id);
+    this.songs = index === -1 ? [...this.songs, song] : this.songs.map((item, itemIndex) => itemIndex === index ? song : item);
+  }
+
 }

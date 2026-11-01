@@ -71,18 +71,15 @@ export class AccountService {
         this.userData.set(null);
     }
 
-    public refreshUserProfile(): void {
-        this.getLoggedInUserProfile()
-        .then((user: UserDto | null) => {
-            if (user) {
-                this.setCurrentUserInfos(user);
-            } else {
+    public async refreshUserProfile(): Promise<void> {
+        try {
+            const user = await this.getLoggedInUserProfile();
+            if (!user) {
                 this.clearUserProfile();
             }
-        })
-        .catch((error: unknown) => {
+        } catch (error: unknown) {
             console.error('Error refreshing user profile:', error);
             this.clearUserProfile();
-        });
+        }
     }
 }

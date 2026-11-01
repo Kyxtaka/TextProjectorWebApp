@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BibleVerse } from '../../../../domain/song/entity/bible-verse.entity';
 import { Song } from '../../../../domain/song/entity/song.entity';
+import { SongService } from '../../../../domain/song/song-service';
 import { ProjectionEventService } from '../../service/projection-event.service';
 
 interface ProjectionTarget {
@@ -21,8 +22,10 @@ interface ProjectionImage {
   styleUrl: './projector-control-page.css',
   templateUrl: './projector-control-page.html',
 })
-export class ProjectorControlPageComponent {
+export class ProjectorControlPageComponent implements OnInit {
   private readonly projectionEvents = inject(ProjectionEventService);
+  private readonly songService = inject(SongService);
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
   protected text = '';
   protected textColor = '#ffffff';
@@ -47,11 +50,8 @@ export class ProjectorControlPageComponent {
   protected contentSearch = '';
   protected selectedSong: Song | null = null;
   protected playlist: Song[] = [];
-  protected readonly songs: Song[] = [
-    { id: 'song-1', title: 'Build My Life', author: 'Pat Barrett', album: 'Sea Of Voices', tags: ['worship'], lyrics: ['Worthy of every song we could ever sing', 'Worthy of all the praise we could ever bring', 'Jesus, the name above every other name'] },
-    { id: 'song-2', title: 'Let Every Heart Sing', author: 'TextProjector Worship', album: 'Sunday Set', tags: ['praise'], lyrics: ['Let every heart sing, let every voice arise', 'Your light is breaking through the night'] },
-    { id: 'song-3', title: 'Great Are You Lord', author: 'All Sons & Daughters', album: 'Great Are You Lord', tags: ['worship', 'classic'], lyrics: ['It is Your breath in our lungs', 'So we pour out our praise'] },
-  ];
+  protected songs: Song[] = [];
+  protected syncMessage = 'Chargement de la bibliothèque cloud...';
   protected readonly bibleVerses: BibleVerse[] = [
     { id: 'john-3-16', book: 'John', chapter: 3, verse: 16, text: 'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.' },
     { id: 'psalm-23-1', book: 'Psalms', chapter: 23, verse: 1, text: 'The Lord is my shepherd, I lack nothing.' },
@@ -60,6 +60,25 @@ export class ProjectorControlPageComponent {
 
   constructor() {
     this.projectionEvents.setTarget(this.selectedTargetId);
+  }
+
+  public async ngOnInit(): Promise<void> {
+    this.songs = [];
+    this.selectedSong = null;
+    this.syncMessage = 'Synchronisation avec le cloud...';
+    this.changeDetector.detectChanges();
+
+    try {
+      this.songs = await this.songService.getAllSongs();
+      this.selectedSong = this.songs[0] ?? null;
+      this.syncMessage = 'Bibliothèque synchronisée avec le cloud';
+      this.changeDetector.detectChanges();
+    } catch {
+      this.songs = [];
+      this.selectedSong = null;
+      this.syncMessage = 'Impossible de charger les chansons depuis le cloud';
+      this.changeDetector.detectChanges();
+    }
   }
 
   protected openProjection(): void {
@@ -82,11 +101,13 @@ export class ProjectorControlPageComponent {
   protected filteredSongs(): Song[] {
     const query = this.contentSearch.trim().toLowerCase();
     if (!query) {
-      return this.songs;
+      return [...this.songs].sort((left, right) => left.title.localeCompare(right.title, 'fr', { sensitivity: 'base' }));
     }
 
-    return this.songs.filter((song) => [song.title, song.author, song.album, ...(song.tags ?? []), ...song.lyrics]
-      .some((value) => value?.toLowerCase().includes(query)));
+    return this.songs
+      .filter((song) => [song.title, song.author, song.album, ...(song.tags ?? []), ...song.lyrics]
+        .some((value) => value?.toLowerCase().includes(query)))
+      .sort((left, right) => left.title.localeCompare(right.title, 'fr', { sensitivity: 'base' }));
   }
 
   protected filteredVerses(): BibleVerse[] {
@@ -103,13 +124,13 @@ export class ProjectorControlPageComponent {
   }
 
   protected togglePlaylist(song: Song): void {
-    this.playlist = this.playlist.some((item) => item.id === song.id)
-      ? this.playlist.filter((item) => item.id !== song.id)
+    this.playlist = this.playlist.some((item) => item._id === song._id)
+      ? this.playlist.filter((item) => item._id !== song._id)
       : [...this.playlist, song];
   }
 
   protected isInPlaylist(song: Song): boolean {
-    return this.playlist.some((item) => item.id === song.id);
+    return this.playlist.some((item) => item._id === song._id);
   }
 
   protected projectSongLine(line: string): void {

@@ -9,8 +9,8 @@
       <div class="list-top"><div><strong>Song library</strong><span>{{ filteredSongs().length }} songs</span></div></div>
       <label class="search-box" for="song-search"><span aria-hidden="true">⌕</span><input id="song-search" type="search" [(ngModel)]="search" placeholder="Search songs or lyrics..." /></label>
       <div class="song-list">
-        @for (song of filteredSongs(); track song.id) {
-          <button class="song-list-item" [class.active]="selectedSong?.id === song.id" type="button" (click)="selectSong(song)"><span class="song-list-icon">♪</span><span><strong>{{ song.title }}</strong><small>{{ song.content.length }} sections</small></span><b>→</b></button>
+          @for (song of filteredSongs(); track song._id) {
+          <button class="song-list-item" [class.active]="selectedSong?._id === song._id" type="button" (click)="selectSong(song)"><span class="song-list-icon">♪</span><span><strong>{{ song.title }}</strong><small>{{ song.content.length }} sections</small></span><b>→</b></button>
         } @empty { <p class="empty-state">No songs found.</p> }
       </div>
     </aside>

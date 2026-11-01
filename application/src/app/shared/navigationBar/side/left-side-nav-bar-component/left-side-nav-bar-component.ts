@@ -17,9 +17,8 @@ const defaultItems: SidebarItem[] = [
   // { id: 'projects', label: 'Projects', icon: 'folder', section: 'Workspace', href: '#projects', badge: '8' },
   { id: 'songs', label: 'Songs', icon: 'music', section: 'Workspace', href: '/songs' },
   { id: 'projector', label: 'Projector', icon: 'projector', section: 'Workspace', href: '/projector' },
-  { id: 'members', label: 'Members', icon: 'users', section: 'Admin', href: '#members' },
-  { id: 'settings', label: 'Settings', icon: 'settings', section: 'Manage', href: '#settings' },
-  { id: 'help', label: 'Help center', icon: 'help', section: 'Manage', href: '#help' },
+  // { id: 'settings', label: 'Settings', icon: 'settings', section: 'Manage', href: '#settings' },
+  // { id: 'help', label: 'Help center', icon: 'help', section: 'Manage', href: '#help' },
 ];
 
 @Component({
@@ -59,8 +58,28 @@ export class LeftSideNavBarComponent {
     }
   }
 
-  ngOnInit(): void {
-    this.accountService.refreshUserProfile();
+  async ngOnInit(): Promise<void> {
+    await this.accountService.refreshUserProfile();
+    if (!this.accountService.isCurrentUserAdmin() && !this.accountService.isCurrentUserSuperAdmin()) {
+      this.items = this.items.filter(item => item.id !== 'settings');
+    }
+    console.log("current user data in left-side-nav-bar-component:", this.accountService.userData());
+    console.log('Current user permission:', this.accountService.userData()?.permission);
+    if (this.accountService.isCurrentUserSuperAdmin()) {
+      this.items.push({ id: 'admin', label: 'Admin Panel', icon: 'users', section: 'Manage', href: '/admin' });
+    }
+    // if (!this.accountService.isCurrentUserSuperAdmin()) {
+    //   this.items = this.items.filter(item => item.id !== 'help');
+    // }
+    // if (!this.accountService.isAuthenticated()) {
+    //   this.items = this.items.filter(item => item.id !== 'settings' && item.id !== 'help');
+    // }
+    // if (this.items.length > 0 && !this.items.some(item => item.id === this.activeItem)) {
+    //   this.activeItem = this.items[0].id;
+    // }
+    // if (this.accountService.isCurrentUserSuperAdmin()) {
+    //   this.items.push({ id: 'admin', label: 'Admin Panel', icon: 'shield', section: 'Manage', href: '/admin' });
+    // }
   }
 
 }

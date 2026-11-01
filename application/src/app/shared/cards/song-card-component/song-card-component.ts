@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Song } from '../../../domain/song/entity/song.entity';
 
-const emptySong: Song = { id: '', title: 'Untitled song', author: '', lyrics: [] };
+const emptySong: Song = { _id: '', title: 'Untitled song', author: '', lyrics: [] };
+// const emptySong: Song = { _id: '', title: 'Untitled song', author: '', lyrics: [] };
 
 @Component({
   imports: [],

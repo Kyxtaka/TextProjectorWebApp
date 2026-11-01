@@ -107,7 +107,8 @@
     <div class="library-grid" [hidden]="contentMode !== 'songs'">
         <div class="library-list">
           <div class="list-heading"><strong>Song library</strong><span>{{ filteredSongs().length }} results</span></div>
-          @for (song of filteredSongs(); track song.id) {
+          <p class="sync-message" role="status">{{ syncMessage }}</p>
+          @for (song of filteredSongs(); track song._id) {
             <button class="song-card compact" type="button" (click)="selectSong(song)"><span class="song-icon" aria-hidden="true">♪</span><span class="song-copy"><strong>{{ song.title }}</strong><small>{{ song.author }}@if (song.album) { <span> · {{ song.album }}</span> }</small></span><span class="song-arrow" aria-hidden="true">→</span></button>
           } @empty {
             <p class="empty-state">No song matches this search.</p>
@@ -120,7 +121,7 @@
               @for (line of song.lyrics; track line) { <button type="button" (click)="projectSongLine(line)">{{ line }}</button> }
             </div>
           } @else { <p class="empty-state">Select a song to browse its lyrics.</p> }
-          <div class="playlist-block"><div class="list-heading"><strong>Playlist</strong><span>{{ playlist.length }} songs</span></div>@for (song of playlist; track song.id) { <button class="playlist-item" type="button" (click)="selectSong(song)"><span>{{ song.title }}</span><small>{{ song.author }}</small></button> } @empty { <p class="empty-state">Your playlist is empty.</p> }</div>
+          <div class="playlist-block"><div class="list-heading"><strong>Playlist</strong><span>{{ playlist.length }} songs</span></div>@for (song of playlist; track song._id) { <button class="playlist-item" type="button" (click)="selectSong(song)"><span>{{ song.title }}</span><small>{{ song.author }}</small></button> } @empty { <p class="empty-state">Your playlist is empty.</p> }</div>
         </div>
     </div>
     <div class="bible-grid" [hidden]="contentMode !== 'bible'">
